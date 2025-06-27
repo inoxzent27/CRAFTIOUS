@@ -1,0 +1,366 @@
+<!-- Copyright (C) INOXZENT.in . All rights reserved. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CRAFTIOUS</title>
+  <link rel="icon" href="!-- Copyright (C) INOXZENT.in Corporation. All rights reserved. --.png" type="image/png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body * { color: black !important; }
+    .intro * {
+      color: white !important;
+      background: linear-gradient(45deg, #00f5a0, #00d9f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://th.bing.com/th/id/OIP.elj6GcLNUVcB1lnqAYhgCgHaE7?w=253&h=180&c=7&r=0&o=7&pid=1.7&rm=3') no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+      color: black;
+    }
+    .intro {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      animation: fadeOut 3s ease forwards;
+      animation-delay: 3s;
+    }
+    .intro h1 { font-size: 3rem; animation: floatIn 1.5s ease; }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+    @keyframes floatIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .auth-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      backdrop-filter: blur(20px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      flex-direction: column;
+    }
+    .auth-box {
+      width: 350px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      backdrop-filter: blur(25px);
+    }
+    .auth-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .auth-box input::placeholder { color: #666; }
+    .auth-box button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(to right, #00f5a0, #00d9f5);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .auth-toggle {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .auth-toggle a {
+      color: #00eaff !important;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .app {
+      display: none;
+      height: 100vh;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar {
+      width: 250px;
+      background: rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      overflow-y: auto;
+      transition: transform 0.4s ease;
+    }
+    .sidebar.hidden { transform: translateX(-100%); }
+
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem;
+      backdrop-filter: blur(8px);
+    }
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .chat {
+      padding: 1rem;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      max-width: 75%;
+      opacity: 0;
+      animation: chatAppear 0.4s ease forwards;
+    }
+    @keyframes chatAppear {
+      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(10px); }
+    }
+    .user { align-self: flex-end; background: rgba(0, 255, 255, 0.15); }
+    .ai { align-self: flex-start; background: rgba(255, 255, 255, 0.1); }
+
+    .input-bar {
+      display: flex;
+      margin-top: 1rem;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 25px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+    button {
+      margin-left: 1rem;
+      padding: 0.8rem 1.4rem;
+      border-radius: 25px;
+      border: none;
+      background: linear-gradient(to right, #00f5a0, #00d9f5);
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { transform: scale(1.05); }
+
+    .toggle-btn, .preview-btn {
+      position: absolute;
+      top: 1rem;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .toggle-btn { left: 3.5rem; }
+    .preview-btn { left: 1rem; }
+
+    .user-count {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 13px;
+      color: black !important;
+    }
+
+    #notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .notification {
+      background: rgba(255, 255, 255, 0.9);
+      color: black;
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+    .notification .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="intro"><h1>CRAFTIUOS</h1></div>
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-box">
+      <h2 id="formTitle">Login</h2>
+      <input type="text" id="username" placeholder="E-mail">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="submitAuth()">Login</button>
+      <div class="auth-toggle">
+        Don't have an account? <a onclick="toggleAuth()">Sign up</a>
+      </div>
+    </div>
+    <div class="user-count">
+      👥NOTIFICATION : IF YOU ALREADY REGISTERD SO WAIT FOR SYSYTEM TO INDENTIFY <span id="userCount"></span>
+    </div>
+  </div>
+
+  <div class="preview-btn" onclick="togglePreview()"></div>
+  <div class="toggle-btn" onclick="toggleSidebar()">☰ History</div>
+
+  <div class="app" id="app">
+    <div class="sidebar" id="sidebar">
+      <h3>📜History</h3>
+      <ul id="history" style="list-style: none; padding: 0;"></ul>
+    </div>
+    <div class="chat-area">
+      <div class="chat-box" id="chat"></div>
+      <div class="input-bar">
+        <input type="text" id="prompt" placeholder="Ask anything">
+        <button onclick="sendPrompt()">ANY?</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification-container"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTWSCcx97VIrEOjiUO_o_qMOJ1cOew8bQ",
+      authDomain: "mydatabasesystem-97a62.firebaseapp.com",
+      projectId: "mydatabasesystem-97a62",
+      storageBucket: "mydatabasesystem-97a62.firebasestorage.app",
+      messagingSenderId: "94296119167",
+      appId: "1:94296119167:web:b53e80805c89afd03f2c4a"
+    };
+
+    const appInstance = initializeApp(firebaseConfig);
+    const auth = getAuth(appInstance);
+    const authScreen = document.getElementById('authScreen');
+    const app = document.getElementById('app');
+    let isLogin = true;
+
+    window.toggleAuth = function () {
+      isLogin = !isLogin;
+      document.getElementById('formTitle').innerText = isLogin ? "Login" : "Sign Up";
+      document.querySelector('.auth-box button').innerText = isLogin ? "Login" : "Sign Up";
+      document.querySelector('.auth-toggle').innerHTML = isLogin ? `Don't have an account? <a onclick="toggleAuth()">Sign up</a>` : `Already have an account? <a onclick="toggleAuth()">Login</a>`;
+    }
+
+    window.submitAuth = async function () {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      if (!user || !pass) return showNotification("Please fill out all fields.");
+      try {
+        if (isLogin) {
+          await signInWithEmailAndPassword(auth, user, pass);
+          showNotification("✅ LOGIN SUCCESSFUL !");
+        } else {
+          await createUserWithEmailAndPassword(auth, user, pass);
+          showNotification("✅ REGISTRATION SUCCESSFUL !");
+        }
+      } catch (err) {
+        showNotification("❌ " + err.message);
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authScreen.style.display = "none";
+        app.style.display = "flex";
+        document.getElementById("userCount").innerText = " (✔)";
+      } else {
+        authScreen.style.display = "flex";
+        app.style.display = "none";
+      }
+    });
+
+    window.toggleSidebar = function () {
+      document.getElementById("sidebar").classList.toggle("hidden");
+    };
+
+    window.togglePreview = function () {
+      app.style.display = app.style.display === "none" ? "flex" : "none";
+    };
+
+    const historyEl = document.getElementById("history");
+    const MODELS = [
+      { name: "gpt-3.5", model: "openai/gpt-3.5-turbo-instruct", key: "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" },
+      { name: "llama3", model: "meta-llama/llama-3-8b-instruct", key: "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" }
+    ];
+    let modelIndex = 0;
+
+    window.sendPrompt = async function () {
+      const input = document.getElementById("prompt");
+      const prompt = input.value.trim();
+      if (!prompt) return;
+      input.value = "";
+      addMessage(prompt, "user");
+      saveToHistory(prompt);
+      const model = MODELS[modelIndex];
+      modelIndex = (modelIndex + 1) % MODELS.length;
+      const loading = addMessage("...", "ai");
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${model.key}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ model: model.model, messages: [{ role: "user", content: prompt }] })
+      });
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || "⚠️ INTERNET ISSUE.";
+      loading.remove();
+      addMessage(reply, "ai");
+    }
+
+    function addMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = `chat ${role}`;
+      div.textContent = text;
+      document.getElementById("chat").appendChild(div);
+      div.scrollIntoView({ behavior: "smooth" });
+      return div;
+    }
+
+    function saveToHistory(msg) {
+      const li = document.createElement("li");
+      li.textContent = msg;
+      li.style.margin = "0.5rem 0";
+      historyEl.appendChild(li);
+    }
+
+    function showNotification(message) {
+      const container = document.getElementById("notification-container");
+      const box = document.createElement("div");
+      box.className = "notification";
+      box.innerHTML = `<span class="close-btn" onclick="this.parentElement.remove()">✖</span>${message}`;
+      container.appendChild(box);
+      setTimeout(() => box.remove(), 7000);
+    }
+  </script>
+</body>
+</html>
